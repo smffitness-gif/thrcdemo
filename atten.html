@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title></title>
+
+    <style>
+        .container {
+            max-width: 1100px;
+            margin: 30px auto;
+            background: rgba(255, 255, 255, .9);
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .3);
+        }
+
+        .hidden {
+            display: none
+        }
+
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            background: #00aaff;
+            color: #fff;
+        }
+
+        button:hover {
+            background: #0077cc
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .form-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        th {
+            background: #eee
+        }
+
+        .radio-box {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+
+        <h1 style="text-align:center">College Attendance System</h1>
+
+        <!-- LOGIN -->
+        <section id="login">
+            <input id="adminPassword" type="password" placeholder="Admin Password">
+            <div style="text-align:center;margin-top:10px">
+                <button onclick="login()">Login</button>
+            </div>
+            <div id="loginMsg" style="text-align:center;color:red"></div>
+        </section>
+
+        <!-- HOME -->
+        <section id="home" class="hidden">
+            <div style="display:flex;gap:10px;justify-content:center">
+                <button onclick="showSection('register')">Register</button>
+                <button onclick="showSection('attendance')">Attendance</button>
+                <button onclick="showSection('report')" style="background:#0a9b4b">Report</button>
+            </div>
+        </section>
+
+        <!-- REGISTER -->
+        <section id="register" class="hidden">
+            <h2>Register Student</h2>
+
+            <div class="form-grid">
+                <select id="studentDept">
+                    <option value="">Select Department</option>
+                    <option>BSC CS</option>
+                    <option>BSC IT</option>
+                    <option>BSC AI</option>
+                </select>
+
+                <select id="studentYear">
+                    <option value="">Select Year</option>
+                    <option>1st Year</option>
+                    <option>2nd Year</option>
+                    <option>3rd Year</option>
+                </select>
+            </div>
+
+            <div class="form-vertical">
+                <input id="studentName" placeholder="Student Name">
+                <input id="studentID" placeholder="Student ID">
+            </div>
+
+            <button onclick="addStudent()">Add Student</button>
+            <button onclick="showSection('home')" style="background:#ff4444">Back</button>
+        </section>
+
+        <!-- ATTENDANCE -->
+        <section id="attendance" class="hidden">
+            <h2>Attendance</h2>
+
+            <input type="date" id="attendanceDate" style="margin-bottom:10px">
+
+            <div class="form-grid">
+                <select id="filterDept">
+                    <option value="">Dept</option>
+                    <option>BSC CS</option>
+                    <option>BSC IT</option>
+                    <option>BSC AI</option>
+                </select>
+
+                <select id="filterYear">
+                    <option value="">Year</option>
+                    <option>1st Year</option>
+                    <option>2nd Year</option>
+                    <option>3rd Year</option>
+                </select>
+            </div>
+
+            <button onclick="renderAttendanceTable()" style="background:#0a9b4b">Load</button>
+
+            <table id="attendanceTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <button onclick="showSection('home')" style="background:#ff4444">Back</button>
+        </section>
+
+        <!-- REPORT -->
+        <section id="report" class="hidden">
+            <h2>Attendance Report</h2>
+
+            <input type="date" id="reportDate">
+
+            <div class="form-grid">
+                <select id="reportDept">
+                    <option value="">Dept</option>
+                    <option>BSC CS</option>
+                    <option>BSC IT</option>
+                    <option>BSC AI</option>
+                </select>
+
+                <select id="reportYear">
+                    <option value="">Year</option>
+                    <option>1st Year</option>
+                    <option>2nd Year</option>
+                    <option>3rd Year</option>
+                </select>
+            </div>
+
+            <button onclick="generateReport()">Generate</button>
+            <button onclick="downloadReport()" style="background:#ff9800">Download Report</button>
+
+            <table id="reportTable">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Total</th>
+                        <th>Present</th>
+                        <th>Absent</th>
+                        <th>%</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <button onclick="showSection('home')" style="background:#ff4444">Back</button>
+        </section>
+
+    </div>
+
+    <script>
+        let students = JSON.parse(localStorage.getItem("students")) || [];
+        let attendanceRecords = JSON.parse(localStorage.getItem("attendance")) || [];
+        const ADMIN_PASSWORD = "admin123";
+
+        function save() {
+            localStorage.setItem("students", JSON.stringify(students));
+            localStorage.setItem("attendance", JSON.stringify(attendanceRecords));
+        }
+
+        function login() {
+            if (adminPassword.value === ADMIN_PASSWORD) showSection("home");
+            else loginMsg.innerText = "Wrong Password";
+        }
+
+        function showSection(id) {
+            ["login", "home", "register", "attendance", "report"].forEach(s =>
+                document.getElementById(s).classList.add("hidden")
+            );
+            document.getElementById(id).classList.remove("hidden");
+        }
+
+        function addStudent() {
+            if (!studentDept.value || !studentYear.value || !studentName.value || !studentID.value) {
+                alert("Fill all fields"); return;
+            }
+            students.push({
+                id: studentID.value,
+                name: studentName.value,
+                dept: studentDept.value,
+                year: studentYear.value
+            });
+            save();
+            studentName.value = studentID.value = studentDept.value = studentYear.value = "";
+        }
+
+        function getStatus(id, date) {
+            let r = attendanceRecords.find(a => a.id === id && a.date === date);
+            return r ? r.status : "";
+        }
+
+        function setAttendance(id, date, status) {
+            attendanceRecords = attendanceRecords.filter(a => !(a.id === id && a.date === date));
+            attendanceRecords.push({ id, date, status });
+            save();
+        }
+
+        function renderAttendanceTable() {
+            let d = attendanceDate.value, dept = filterDept.value, year = filterYear.value;
+            let body = document.querySelector("#attendanceTable tbody");
+            body.innerHTML = "";
+            if (!d || !dept || !year) {
+                body.innerHTML = "<tr><td colspan='3'>Select all filters</td></tr>";
+                return;
+            }
+            students.filter(s => s.dept === dept && s.year === year).forEach(s => {
+                let st = getStatus(s.id, d);
+                body.innerHTML += `
+        <tr>
+            <td>${s.id}</td>
+            <td>${s.name}</td>
+            <td>
+                <div class="radio-box">
+                    <label>
+                        <input type="radio" name="att_${s.id}"
+                        ${st === "Present" ? "checked" : ""}
+                        onclick="setAttendance('${s.id}','${d}','Present')"> Present
+                    </label>
+                    <label>
+                        <input type="radio" name="att_${s.id}"
+                        ${st === "Absent" ? "checked" : ""}
+                        onclick="setAttendance('${s.id}','${d}','Absent')"> Absent
+                    </label>
+                </div>
+            </td>
+        </tr>`;
+            });
+        }
+
+        function generateReport() {
+            let date = reportDate.value, dept = reportDept.value, year = reportYear.value;
+            let body = document.querySelector("#reportTable tbody");
+            body.innerHTML = "";
+            if (!date || !dept || !year) return;
+
+            students.filter(s => s.dept === dept && s.year === year).forEach(s => {
+                let rec = attendanceRecords.find(a => a.id === s.id && a.date === date);
+                let p = rec && rec.status === "Present" ? 1 : 0;
+                let a = 1 - p;
+                body.innerHTML += `
+        <tr>
+            <td>${s.id}</td>
+            <td>${s.name}</td>
+            <td>1</td>
+            <td>${p}</td>
+            <td>${a}</td>
+            <td>${p ? 100 : 0}%</td>
+        </tr>`;
+            });
+        }
+    </script>
+
+</body>
+
+</html>

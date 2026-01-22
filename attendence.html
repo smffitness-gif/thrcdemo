@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Attendance</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+<h2>Attendance</h2>
+
+<div class="form-grid">
+<select id="filterDept">
+<option value="">Dept</option>
+<option>BSC CS</option>
+<option>BSC IT</option>
+<option>BSC AI</option>
+</select>
+
+<select id="filterYear">
+<option value="">Year</option>
+<option>1st Year</option>
+<option>2nd Year</option>
+<option>3rd Year</option>
+</select>
+</div>
+
+<button onclick="loadAttendance()">Load</button>
+
+<table>
+<thead><tr><th>ID</th><th>Name</th><th>Status</th></tr></thead>
+<tbody id="attendanceBody"></tbody>
+</table>
+
+<a href="home.html"><button style="background:red">Back</button></a>
+</div>
+
+<script src="atten.js"></script>
+</body>
+</html>

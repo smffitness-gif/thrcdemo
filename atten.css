@@ -1,0 +1,65 @@
+body{
+    margin:0;
+    font-family:Arial, Helvetica, sans-serif;
+    background:#222;
+}
+
+.container{
+    max-width:1100px;
+    margin:30px auto;
+    background:rgba(255,255,255,.95);
+    padding:25px;
+    border-radius:15px;
+    box-shadow:0 10px 30px rgba(0,0,0,.3);
+}
+
+h1,h2{text-align:center}
+
+button{
+    padding:10px 16px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:600;
+    background:#00aaff;
+    color:white;
+}
+button:hover{background:#0077cc}
+
+input,select{
+    width:100%;
+    padding:10px;
+    border-radius:8px;
+    border:1px solid #ccc;
+}
+
+.form-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:12px;
+    margin-bottom:12px;
+}
+
+.form-vertical{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:15px;
+}
+th,td{
+    padding:10px;
+    border:1px solid #ccc;
+    text-align:center;
+}
+th{background:#eee}
+
+.radio-box{
+    display:flex;
+    justify-content:center;
+    gap:25px;
+}
